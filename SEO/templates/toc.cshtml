@@ -1,0 +1,525 @@
+﻿@using Mediaparts.Features.PublicationExporting.DAL.Razor
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.Contexts
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.PageContent
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.Settings
+
+@{
+    RazorBaseContext PublicationModel = null;
+    string tocURL = "./toc.html";
+    var IS_DEBUG = false;
+
+
+    if (Model is RazorBaseContext)
+    {
+        PublicationModel = (RazorBaseContext)Model;
+        //Костыль, потому что basic находится в папке assets/basic-html
+        PublicationModel.DynamicFilesFolder = new Uri("./..", UriKind.Relative);
+        PublicationModel.StaticFilesFolder = new Uri(".", UriKind.Relative);
+    }
+    else
+    {
+        //Fill this to debug
+        PublicationModel = new RazorBaseContext();
+        PublicationModel.DynamicFilesFolder = new Uri("./debug", UriKind.Relative);
+        PublicationModel.StaticFilesFolder = new Uri(".", UriKind.Relative);
+
+        using (var fs = File.OpenRead(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug/model.bin")))
+        {
+            var deserializer = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            PublicationModel.ProjectModel = (RazorProjectModel)deserializer.Deserialize(fs);
+        }
+
+        tocURL = "./toc.cshtml";
+        IS_DEBUG = true;
+    }
+
+    if (PublicationModel.ProjectModel.TableOfContents == null || !PublicationModel.ProjectModel.TableOfContents.Children.Any())
+    {
+        tocURL = String.Empty;
+    }
+}
+@{
+    int lastIndex = PublicationModel.ProjectModel.Pages.Count() - 1;
+    var bgColor = System.Drawing.ColorTranslator.ToHtml(PublicationModel.ProjectModel.Styles.PublicationBackgroundColor);
+    var textColor = System.Drawing.ColorTranslator.ToHtml(PublicationModel.ProjectModel.Styles.BackgroundTextСolor);
+    string coverPath = PublicationModel.DynamicFilesFolder + "/flash/pages/page0001_s." + ImageFormat(PublicationModel.ProjectModel.Pages.ElementAt(0).ThumbnailImageType);
+    string bgImage = (PublicationModel.ProjectModel.Styles.PublicationBackgroundImage == null) ? "" : (PublicationModel.DynamicFilesFolder + "/" + PublicationModel.ProjectModel.Styles.PublicationBackgroundImage.OriginalString);
+}
+
+
+@helper RenderTOCLevel(RazorBaseContext publicationModel, RazorTocItem item, int level)
+{
+	<table class="tocTable" style="margin-left: @(level)em;">
+		<tr>
+			<td class="tocItemDots">
+               
+                <hr class="dotsHR"/>
+
+                <span class="tocItemTitle">
+                    <a class="internalLink" href="@PageUrl(PageModelById(publicationModel,item.PageId))">@item.Name</a>
+                </span>
+            </td>
+			<td class="tocItemNumber">@(PageModelById(publicationModel,item.PageId).UrlHeader)</td>
+		</tr>
+	</table>
+
+	foreach (var child in item.Children)
+	{
+		@Html.Raw(RenderTOCLevel(publicationModel, child, level + 1).ToString())
+	}
+}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=@PublicationModel.ProjectModel.Settings.CharSet.WebName" />
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.5, minimum-scale=0.5, user-scalable=yes, maximum-scale=2.0, target-densitydpi=device-dpi" />
+
+	<title>@PublicationModel.ProjectModel.PublicationName</title>
+
+    @if (PublicationModel.ProjectModel.Styles.FavIcon != null)
+    {
+        <link href="@(PublicationModel.DynamicFilesFolder)/@(PublicationModel.ProjectModel.Styles.FavIcon.OriginalString + '?' + Guid.NewGuid().ToString().Substring(0,8))" rel="shortcut icon" type="image/x-icon" />
+    }
+	<meta charset="@PublicationModel.ProjectModel.Settings.CharSet.WebName">
+
+	<meta name="robots" content="all" />
+
+	<link href="@PublicationModel.StaticFilesFolder/styles/style.css" type="text/css" rel="stylesheet" />
+	<link href="@PublicationModel.StaticFilesFolder/styles/toc.css" type="text/css" rel="stylesheet" />
+	<link href="@PublicationModel.StaticFilesFolder/styles/mobile.css" type="text/css" rel="stylesheet" />
+	
+    <script type="text/javascript">
+		@if (IS_DEBUG)
+        {
+			<text>IS_DEBUG = true;</text>
+        }
+        MAIN_PAGE     = "@PublicationModel.IndexFileName";
+        FILES_FOLDER  = "@PublicationModel.FilesFolderName";
+        TOC_BOOK_HEIGHT = @(PublicationModel.ProjectModel.Styles.BookSize.Width);
+        HTML5_PUBLICATION = @PublicationModel.ProjectModel.IsHtml5Publication.ToString().ToLower();
+
+         @if (PublicationModel.ProjectModel.Settings.IsMobileVersionCompatibilityOn)
+        {
+            <text>COMPATIBLE = true;</text>
+        }
+    </script>
+
+	<script src="@PublicationModel.StaticFilesFolder/javascript/init.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+        
+		STATIC_FOLDER = "@(PublicationModel.StaticFilesFolder.ToString())";
+		DYNAMIC_FOLDER = "@(PublicationModel.DynamicFilesFolder.ToString())";
+
+		PUBLICATION_NAME = @{WriteLiteral(JavaScriptStringEncode(PublicationModel.ProjectModel.PublicationName, true));};
+
+		CURRENT_VERSION = "@(PublicationModel.ProjectModel.Settings.PublisherVersion)";
+		@{
+            var langs = String.Join(",", PublicationModel.ProjectModel.Settings.Locales.Select(i => ("'" + i + "'")));
+		}
+		LANGS = [@(Html.Raw(langs))];
+		PUBLICATION_TYPE = "@(PublicationModel.ProjectModel.PublicationType.ToString().ToLower())";
+
+		var main = function () {
+
+			loadScript('@PublicationModel.StaticFilesFolder/javascript/localizator.js',function(){});
+
+		    if (document.domain.indexOf('publ.com') != -1 || document.domain.indexOf('cld.bz') != -1 || document.domain.indexOf('cld.mobi') != -1|| document.domain.indexOf('cld.local') != -1) {
+				var staticServer = window.location.protocol === 'https:' ? 'https://d2ayihadozxfln.cloudfront.net' : ('http://static.' + window.location.hostname)
+				var url = staticServer + "/publication/" + CURRENT_VERSION + "/basic/cloud.js";
+				loadScript(url,function(){});
+			}
+
+			@if (PublicationModel.ProjectModel.Analytics.UseUniversalAnalytics && !String.IsNullOrEmpty(PublicationModel.ProjectModel.Analytics.GoogleUANumber))
+            {
+				<text>initAnalytics("basic");</text>
+            }
+		}
+
+		if (!!window.addEventListener) {
+			window.addEventListener('load', main);
+		} else {
+			window.attachEvent('onload', main);
+		}
+
+		function loadScript(url, callback){
+			var head = document.getElementsByTagName("head")[0];
+			var script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.src = url;
+			head.appendChild(script);
+			if (script.readyState){
+				script.onreadystatechange = function(){
+					if (script.readyState == "loaded" ||
+							script.readyState == "complete"){
+						script.onreadystatechange = null;
+						callback();
+					}
+				};
+			} else {
+				script.onload = function(){
+					callback();
+				};
+			}
+		}
+</script>
+
+@if (!String.IsNullOrEmpty(PublicationModel.ProjectModel.Analytics.GoogleUANumber))
+{
+    if (PublicationModel.ProjectModel.Analytics.UseUniversalAnalytics)
+    {
+		<script type="text/javascript">
+			var startDate = new Date().getTime();
+			function initAnalytics(version)
+			{
+				var domain = typeof window.location !== "undefined"? window.location.hostname: '';
+				if (typeof universalAnalytics !== 'undefined'){
+					@{
+        var ipAnonim = PublicationModel.ProjectModel.Analytics.IpAnonymizationEnabled;
+						}
+					universalAnalytics.init(['@PublicationModel.ProjectModel.Analytics.GoogleUANumber'], domain, version, startDate, CURRENT_VERSION, @(ipAnonim.ToString().ToLower()));
+					universalAnalytics.pageView("toc");
+				}
+			}
+
+		</script>
+		<script type="text/javascript" src="@(PublicationModel.StaticFilesFolder)/analytics/ua.js">
+	}
+	else
+	{
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', '@PublicationModel.ProjectModel.Analytics.GoogleUANumber']);
+			_gaq.push(['_setAccount', '@PublicationModel.ProjectModel.Analytics.GoogleUANumber']);
+			_gaq.push(['_setAllowLinker', true]);
+			_gaq.push(['_trackPageview']);
+			@if (PublicationModel.ProjectModel.Analytics.IpAnonymizationEnabled)
+            {
+				<text>_gaq.push (['_gat._anonymizeIp']);</text>
+            }
+
+			(function () {
+				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			})();
+		</script>
+    }
+
+}
+
+</head>
+<body style="font-size: @(DEFAULT_SIZE)px">
+    @if (!String.IsNullOrEmpty(bgImage))
+    {
+    <img id="bodyBg" class="bodyBg" src="@bgImage" alt="Background Image" />
+    }
+
+	<div class="infoPopUp" id="infoPopUp"></div>
+	<div class="popUp" id="popUp">
+		<a id="closeButton" class="closeButtonPopUp" href="#"></a>
+		<table class="popUpTable">
+			<tbody>
+				<tr>
+					<td>
+						<img alt="Cover" src="@coverPath" class="popUpCover" />
+					</td>
+					<td>
+						<h4 id="popupTitle">&nbsp;</h4>
+						<p id="popupText"></p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="toolbar">
+		<ul class="zoomContainer" id="zoomContainer">
+			<li>
+				<a class="zoomInButton" id="zoomIn" href="#">
+					<img src="styles/zoomIn.png" alt="Zoom In" />
+				</a>
+			</li>
+			<li>
+				<a class="zoomOutButton" id="zoomOut" href="#">
+					<img src="styles/zoomOut.png" alt="Zoom Out" />
+				</a>
+			</li>
+		</ul>
+
+        <div class="toolbarButtons">
+            <a class="tocButton toolbarLink internalLink" href="@tocURL" id="tocLink">
+                <img class="iconToolbar" src="styles/toc.png" alt="Table of Contents" />
+                <img class="iconToolbar mobile" src="styles/toc-mobile.png" alt="Table of Contents" />
+                <span id="tocLabel" class="titleTOCMenu"></span>
+            </a>
+            @{
+                var downloads = PublicationModel.ProjectModel.Downloads;
+                var hasDownloads = downloads != null &&
+                                    (downloads.Mac != null ||
+                                     downloads.Windows != null ||
+                                    (downloads.Pdf != null && PublicationModel.ProjectModel.PublicationType != RazorPublicationType.PhotoAlbum) ||
+                                    (downloads.UserFiles != null && downloads.UserFiles.Any()));
+            }
+            @if (hasDownloads)
+            {
+
+                <ul class="downloadButton toolbarLink">
+                    <li class="iconLi">
+                        <img class="iconToolbar" src="styles/save.png" alt="Downloads" />
+                        <img class="iconToolbar mobile" src="styles/save-mobile.png" alt="Downloads" />
+                    </li>
+                    @if (PublicationModel.ProjectModel.Downloads.Pdf != null)
+                    {
+                        <li id="downloadPdf" class="downloadSubMenu">
+                            <a id="downloadPdfLink" href="@(PublicationModel.DynamicFilesFolder)/@PublicationModel.ProjectModel.Downloads.Pdf.File.OriginalString" target="_blank"></a>
+                        </li>
+                    }
+                    @if (PublicationModel.ProjectModel.Downloads.Mac != null)
+                    {
+                        <li id="downloadMac" class="downloadSubMenu">
+                            <a id="downloadMacLink" href="@(PublicationModel.DynamicFilesFolder)/@PublicationModel.ProjectModel.Downloads.Mac.File.OriginalString" target="_blank"></a>
+                        </li>
+                    }
+                    @if (PublicationModel.ProjectModel.Downloads.Windows != null)
+                    {
+                        <li id="downloadWindows" class="downloadSubMenu">
+                            <a id="downloadWindowsLink" href="@(PublicationModel.DynamicFilesFolder)/@PublicationModel.ProjectModel.Downloads.Mac.File.OriginalString" target="_blank"></a>
+                        </li>
+                    }
+                    @foreach (var userFile in PublicationModel.ProjectModel.Downloads.UserFiles)
+                    {
+                        <li class="downloadSubMenu userFile">
+                            <a href="@(PublicationModel.DynamicFilesFolder)/@userFile.File.OriginalString" target="_blank">@Path.GetFileName(userFile.File.OriginalString)</a>
+                        </li>
+                    }
+                </ul>
+            }
+            </div>
+
+            @{
+                var next = PageUrl(PublicationModel.ProjectModel.Pages.ElementAt(0));
+            }
+            @if (PublicationModel.ProjectModel.Settings.RtlModeEnabled)
+            {
+                <a class="toLeftButton toolbarLink internalLink" href="@next"><img class="iconToolbar" src="styles/previous.png" alt="Next Page" /></a>
+                <span class="pager">@PublicationModel.ProjectModel.PublicationName</span>
+            }
+            else
+            {
+                <span class="pager">@PublicationModel.ProjectModel.PublicationName</span>
+                <a class="toRightButton toolbarLink internalLink" href="@next"><img class="iconToolbar" src="styles/next.png" alt="Next Page" /></a>
+            }
+
+            @if (PublicationModel.ProjectModel.IsShareEnabled)
+            {
+            <ul class="sharingContainer">
+                <li>
+                    <a class="facebookShare" id="facebookShare" href="#" target="_blank">
+                        <img src="styles/facebook_32.png" alt="Share On Facebook" />
+                        <span id="facebookShareText" class="shareTitleMenu"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="twitterShare" id="twitterShare" href="#" target="_blank">
+                        <img src="styles/twitter_32.png" alt="Tweet" />
+                        <span id="twitterShareText" class="shareTitleMenu"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="linkedinShare" id="linkedinShare" href="#" target="_blank">
+                        <img src="styles/linkedin_32.png" alt="Share on LinkedIn" />
+                        <span id="linkedinShareText" class="shareTitleMenu"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="tumblrShare" id="tumblrShare" href="#" target="_blank">
+                        <img src="styles/tumblr_32.png" alt="Share on Tumblr" />
+                        <span id="tumblrShareText" class="shareTitleMenu"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="googleShare" id="googleShare" href="#" target="_blank">
+                        <img src="styles/google_32.png" alt="Share on Google+" />
+                        <span id="googleShareText" class="shareTitleMenu"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="mailShare" id="mailShare" href="#" target="_blank">
+                        <img src="styles/email_32.png" alt="E-mail" />
+                        <span id="mailShareText" class="shareTitleMenu"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="vkShare" id="vkShare" href="#" target="_blank">
+                        <img src="styles/vk_32.png" alt="Share on VK" />
+                        <span id="vkShareText" class="shareTitleMenu"></span>
+                    </a>
+                </li>
+            </ul>
+            }
+
+            <div class="verContainer" id="verContainer">
+                <span id ="basicVersionTitle" class="basicInfoTitle"></span>
+                    <a id="infoButton" class="toolbarLink info" href="#"><img class="iconInfo" src="styles/info.png" alt="Information" /></a>
+
+</div>
+
+    </div>
+
+	<div class="mainFrame" id="mainFrame">
+        @{
+            var mobileButtonStyle = "display:none;";
+            if (!String.IsNullOrEmpty(tocURL) || PublicationModel.ProjectModel.IsShareEnabled || PublicationModel.ProjectModel.Downloads != null)
+            {
+                mobileButtonStyle = "";
+            }
+        }
+        <a class="mobileMenuButton" id="mobileMenuButton" style="@mobileButtonStyle">
+            <img src="styles/mobile-menu.png" alt="Show Menu" />
+        </a>
+         
+		<div class="mobileNav">
+			@if (PublicationModel.ProjectModel.Settings.RtlModeEnabled)
+            {
+				<a class="toLeftButton toolbarLink internalLink" href="@next"><img class="iconToolbar" src="styles/prev-mob.png" alt="Next Page" /></a>
+				<span class="pager">@PublicationModel.ProjectModel.PublicationName</span>
+            }
+            else
+            {
+				<span class="pager">@PublicationModel.ProjectModel.PublicationName</span>
+				<a class="toRightButton toolbarLink internalLink" href="@next"><img class="iconToolbar" src="styles/next-mob.png" alt="Next Page" /></a>
+            }
+		</div>
+
+		<div id="pageContainer" class="pageContainer" style="width: @(PublicationModel.ProjectModel.Styles.BookSize.Width)px; margin: 40px 0 0 -@(PublicationModel.ProjectModel.Styles.BookSize.Width / 2)px; background-color:#ffffff;">
+			<h2 id="tocTitle" class="tocTitle">&nbsp;</h2>
+			<hr class="titleHR" />
+			<br>
+			@foreach (var child in PublicationModel.ProjectModel.TableOfContents.Children)
+            {
+				@RenderTOCLevel(PublicationModel, child, 0);
+            }
+		</div>
+
+		<div class="footer">
+			@if (PublicationModel.ProjectModel.CopyrightSettings.IsSeoPoweredByLinkVisible)
+            {
+				<a class="footerLink" style="color:@(textColor);" href="./flipbook.html" target="_blank">
+					<span id="poweredBy"></span>&nbsp;FlippingBook
+				</a>
+            }
+            else
+            {
+                if (PublicationModel.ProjectModel.CopyrightSettings.IsButtonVisible)
+                {
+					<a class="footerLink" style="color:@(textColor);" href="@PublicationModel.ProjectModel.CopyrightSettings.Link" target="_@PublicationModel.ProjectModel.CopyrightSettings.LinkTarget.ToString().ToLower()">
+						@PublicationModel.ProjectModel.CopyrightSettings.Text
+					</a>
+				}
+			}
+		</div>
+	</div>
+	<script type="text/javascript">
+		BASIC_PAGE = new BasicPage();
+	</script>
+</body>
+</html>
+@functions{
+    public static int DEFAULT_SIZE = 20;
+
+    public RazorPageModel PageModelById(RazorBaseContext PublicationModel, int id)
+    {
+        return PublicationModel.ProjectModel.Pages.First(x => x.Id == id);
+    }
+
+    public static string PageUrl(RazorPageModel model)
+    {
+        return String.Format("./page-{0}.html", model.UrlHeader);
+    }
+
+
+    public static string ImageFormat(RazorImageFormatType format)
+    {
+        switch (format)
+        {
+            case RazorImageFormatType.Jpeg:
+                return "jpg";
+            case RazorImageFormatType.Png:
+                return "png";
+        }
+        return "";
+    }
+    public static string JavaScriptStringEncode(string value, bool addDoubleQuotes)
+    {
+        if (String.IsNullOrEmpty(value))
+            return addDoubleQuotes ? "\"\"" : String.Empty;
+
+        int len = value.Length;
+        bool needEncode = false;
+        char c;
+        for (int i = 0; i < len; i++)
+        {
+            c = value[i];
+
+            if (c >= 0 && c <= 31 || c == 34 || c == 39 || c == 60 || c == 62 || c == 92)
+            {
+                needEncode = true;
+                break;
+            }
+        }
+
+        if (!needEncode)
+            return addDoubleQuotes ? "\"" + value + "\"" : value;
+
+        var sb = new System.Text.StringBuilder();
+        if (addDoubleQuotes)
+            sb.Append('"');
+
+        for (int i = 0; i < len; i++)
+        {
+            c = value[i];
+            if (c >= 0 && c <= 7 || c == 11 || c >= 14 && c <= 31 || c == 39 || c == 60 || c == 62)
+                sb.AppendFormat("\\u{0:x4}", (int)c);
+            else switch ((int)c)
+                {
+                    case 8:
+                        sb.Append("\\b");
+                        break;
+
+                    case 9:
+                        sb.Append("\\t");
+                        break;
+
+                    case 10:
+                        sb.Append("\\n");
+                        break;
+
+                    case 12:
+                        sb.Append("\\f");
+                        break;
+
+                    case 13:
+                        sb.Append("\\r");
+                        break;
+
+                    case 34:
+                        sb.Append("\\\"");
+                        break;
+
+                    case 92:
+                        sb.Append("\\\\");
+                        break;
+
+                    default:
+                        sb.Append(c);
+                        break;
+                }
+        }
+
+        if (addDoubleQuotes)
+            sb.Append('"');
+
+        return sb.ToString();
+    }
+}

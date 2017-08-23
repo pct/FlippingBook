@@ -1,0 +1,915 @@
+﻿@using Mediaparts.Features.PublicationExporting.DAL.Razor
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.Contexts
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.PageContent
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.Settings
+@using Newtonsoft.Json
+
+@{
+    RazorPageContext PublicationModel = null;
+    string tocURL = "./toc.html";
+    var IS_DEBUG = false;
+
+
+
+    if (Model is RazorPageContext)
+    {
+        PublicationModel = (RazorPageContext)Model;
+        //Костыль, потому что basic находится в папке assets/basic-html
+        PublicationModel.DynamicFilesFolder = new Uri("./..", UriKind.Relative);
+        PublicationModel.StaticFilesFolder = new Uri(".", UriKind.Relative);
+    }
+    else
+    {
+        //Fill this to debug
+        PublicationModel = new RazorPageContext();
+        PublicationModel.DynamicFilesFolder = new Uri("./debug", UriKind.Relative);
+        PublicationModel.StaticFilesFolder = new Uri(".", UriKind.Relative);
+
+        using (var fs = File.OpenRead(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug/model.bin")))
+        {
+            var deserializer = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            PublicationModel.ProjectModel = (RazorProjectModel)deserializer.Deserialize(fs);
+        }
+
+        var PAGE_ID = 1;
+        PublicationModel.PageIndex = PublicationModel.ProjectModel.Pages.Select((a, i) => new { a, i }).First(x => x.a.Id == PAGE_ID).i;
+
+        tocURL = "./toc.cshtml";
+
+        IS_DEBUG = true;
+    }
+
+    if (PublicationModel.ProjectModel.TableOfContents == null || PublicationModel.ProjectModel.TableOfContents.Children.Count() == 0)
+    {
+        tocURL = String.Empty;
+
+    }
+
+
+}
+@{
+    RazorPageModel current = (RazorPageModel)PublicationModel.ProjectModel.Pages.ElementAt(PublicationModel.PageIndex);
+    int lastIndex = PublicationModel.ProjectModel.Pages.Count() - 1;
+
+    var textColor = System.Drawing.ColorTranslator.ToHtml(PublicationModel.ProjectModel.Styles.BackgroundTextСolor);
+    var bgColor = System.Drawing.ColorTranslator.ToHtml(PublicationModel.ProjectModel.Styles.PublicationBackgroundColor);
+    string coverPath = PublicationModel.DynamicFilesFolder + "/flash/pages/page0001_s." + ImageFormat(PublicationModel.ProjectModel.Pages.ElementAt(0).ThumbnailImageType);
+
+    string bgImage = (PublicationModel.ProjectModel.Styles.PublicationBackgroundImage == null) ? "" : (PublicationModel.DynamicFilesFolder + "/" + PublicationModel.ProjectModel.Styles.PublicationBackgroundImage.OriginalString);
+
+    var GALLERY_CONTENT = new Dictionary<string, IEnumerable<string>>();
+    var videos = current.Content.OfType<RazorVideo>().ToArray();
+
+    var VIDEOS_DICT = new Dictionary<RazorVideo, string>();
+    var VIDEOS_INFO = new Dictionary<String, Object>();
+    for (var i = 0; i < videos.Length; i++)
+    {
+        var videoId = "video" + i;
+        var razorVideo = videos[i];
+        VIDEOS_DICT.Add(razorVideo, videoId);
+        VIDEOS_INFO.Add(videoId, new
+        {
+            thumb = (razorVideo.Image!=null && razorVideo.ShowImage)? (PublicationModel.DynamicFilesFolder + "/common/pages-content/" + razorVideo.Image.ToString()): "", 
+            videoId = razorVideo.Id
+        });
+        
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=@PublicationModel.ProjectModel.Settings.CharSet.WebName" />
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.5, minimum-scale=0.5, user-scalable=yes, maximum-scale=2.0, target-densitydpi=device-dpi" />
+
+    <title>@PublicationModel.ProjectModel.PublicationName</title>
+
+    @if (PublicationModel.ProjectModel.Styles.FavIcon != null)
+    {
+        <link href="@(PublicationModel.DynamicFilesFolder)/@(PublicationModel.ProjectModel.Styles.FavIcon.OriginalString + '?' + Guid.NewGuid().ToString().Substring(0,8))" rel="shortcut icon" type="image/x-icon" />
+    }
+    <meta charset="@PublicationModel.ProjectModel.Settings.CharSet.WebName">
+
+    @if (!String.IsNullOrEmpty(current.SeoSettings.Description))
+    {
+        <meta name="description" content="@current.SeoSettings.Description">
+    }
+    <meta name="robots" content="@MetaRobots(current.SeoSettings)"/>
+
+	<link href="@PublicationModel.StaticFilesFolder/styles/style.css" type="text/css" rel="stylesheet" />
+	<link href="@PublicationModel.StaticFilesFolder/styles/mobile.css" type="text/css" rel="stylesheet" />
+	
+    <script type="text/javascript">
+		@if (IS_DEBUG)
+        {
+			<text>IS_DEBUG = true;</text>
+        }
+    CURRENT_PAGE = "@(current.UrlHeader)";
+    MAIN_PAGE     = "@PublicationModel.IndexFileName";
+    FILES_FOLDER  = "@PublicationModel.FilesFolderName";
+    HTML5_PUBLICATION = @PublicationModel.ProjectModel.IsHtml5Publication.ToString().ToLower();
+
+    @if (PublicationModel.ProjectModel.Settings.IsMobileVersionCompatibilityOn)
+         {
+            <text>COMPATIBLE = true;</text>
+         }
+
+    
+    </script>
+	
+	
+	<script src="@PublicationModel.StaticFilesFolder/javascript/init.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        STATIC_FOLDER = "@(PublicationModel.StaticFilesFolder.ToString())";
+        DYNAMIC_FOLDER = "@(PublicationModel.DynamicFilesFolder.ToString())";
+
+        PUBLICATION_NAME = @{WriteLiteral(JavaScriptStringEncode(PublicationModel.ProjectModel.PublicationName, true));};
+
+        CURRENT_VERSION = "@(PublicationModel.ProjectModel.Settings.PublisherVersion)";
+        @{
+             var langs = String.Join(",", PublicationModel.ProjectModel.Settings.Locales.Select(i => ("'" + i + "'")));
+	    }
+        LANGS = [@(Html.Raw(langs))];
+        PUBLICATION_TYPE = "@(PublicationModel.ProjectModel.PublicationType.ToString().ToLower())";
+        VIDEOS_INFO = @Html.Raw(JsonConvert.SerializeObject(VIDEOS_INFO, Formatting.Indented));
+
+    var main = function () {
+
+        loadScript('@PublicationModel.StaticFilesFolder/javascript/localizator.js',function(){});
+
+        if (document.domain.indexOf('publ.com') != -1 || document.domain.indexOf('cld.bz') != -1 || document.domain.indexOf('cld.mobi') != -1 || document.domain.indexOf('cld.local') != -1) {
+            var staticServer = window.location.protocol === 'https:' ? 'https://d2ayihadozxfln.cloudfront.net' : ('http://static.' + window.location.hostname);
+            var url = staticServer + "/publication/" + CURRENT_VERSION + "/basic/cloud.js";
+            loadScript(url,function(){});
+        }
+
+        @if (PublicationModel.ProjectModel.Analytics.UseUniversalAnalytics && !String.IsNullOrEmpty(PublicationModel.ProjectModel.Analytics.GoogleUANumber))
+        {
+			<text>initAnalytics("basic");</text>
+        }
+    }
+
+    if (!!window.addEventListener) {
+        window.addEventListener('load', main);
+    } else {
+        window.attachEvent('onload', main);
+    }
+
+    function loadScript(url, callback){
+        var head = document.getElementsByTagName("head")[0];
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = url;
+        head.appendChild(script);
+        if (script.readyState){
+            script.onreadystatechange = function(){
+                if (script.readyState == "loaded" ||
+						script.readyState == "complete"){
+                    script.onreadystatechange = null;
+                    callback();
+                }
+            };
+        } else {
+            script.onload = function(){
+                callback();
+            };
+        }
+    }
+    </script>
+
+    @if (!String.IsNullOrEmpty(PublicationModel.ProjectModel.Analytics.GoogleUANumber))
+    {
+        if (PublicationModel.ProjectModel.Analytics.UseUniversalAnalytics)
+        {
+		     <script type="text/javascript">
+                    var startDate = new Date().getTime();
+				    function initAnalytics(version)
+				    {
+					    var domain = typeof window.location !== "undefined"? window.location.hostname: '';
+					    if (typeof universalAnalytics !== 'undefined'){
+						    @{
+                                var ipAnonim = PublicationModel.ProjectModel.Analytics.IpAnonymizationEnabled;
+						    }
+						    universalAnalytics.init(['@PublicationModel.ProjectModel.Analytics.GoogleUANumber'], domain, version, startDate, CURRENT_VERSION, @(ipAnonim.ToString().ToLower()));
+						    universalAnalytics.pageView(CURRENT_PAGE);
+					    }
+				    }
+
+		    </script>
+		    <script type="text/javascript" src="@(PublicationModel.StaticFilesFolder)/analytics/ua.js">
+	    } else
+	    {
+	      <script type="text/javascript">
+		     var _gaq = _gaq || [];
+		    _gaq.push(['_setAccount', '@PublicationModel.ProjectModel.Analytics.GoogleUANumber']);
+		    _gaq.push(['_setAllowLinker', true]);
+		    _gaq.push(['_trackPageview']);
+		    @if (PublicationModel.ProjectModel.Analytics.IpAnonymizationEnabled)
+            {
+			    <text>_gaq.push (['_gat._anonymizeIp']);</text>
+            }
+
+		    (function () {
+			    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		    })();
+	    </script>
+        }
+
+    }
+
+    <style type="text/css">
+        .areaLinkItem:hover, .contentItemHover:hover, .emptyImage:hover
+        {
+            @areaLinkBgStyle(PublicationModel.ProjectModel.Styles.LinksHighlightColor)
+        }
+
+
+        @{
+            var els = (current.Content.Where(i => i is RazorLink && (i as RazorLink).HighlightColor.HasValue));
+            var counter = 1;
+            foreach (RazorLink el in els)
+            {
+			<text>#areaLink@(counter):hover
+			{
+				@areaLinkBgStyle(el.HighlightColor.Value)
+			}
+			</text>
+                areaLinkIndexDictionary[el] = counter++;
+            }
+        }
+    </style>
+</head>
+<body style="font-size: @(DEFAULT_SIZE)px; background-color: @bgColor;">
+    @if (!String.IsNullOrEmpty(bgImage))
+    {
+	    <img id="bodyBg" class="bodyBg" src="@bgImage" alt="Background Image" />
+    }
+	<div class="infoPopUp" id="infoPopUp" ></div>
+	<div class="popUp" id="popUp">
+		<a id="closeButton" class="closeButtonPopUp" href="#"></a>
+		<table class="popUpTable">
+			<tbody>
+				<tr>
+					<td>
+						<img alt="Cover" src="@coverPath" class="popUpCover" />
+					</td>
+					<td>
+						<h4 id="popupTitle">&nbsp;</h4>
+						<p id="popupText"></p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="toolbar">
+		<ul class="zoomContainer" id="zoomContainer">
+			<li>
+				<a class="zoomInButton" id="zoomIn" href="#">
+					<img src="styles/zoomIn.png" alt="Zoom In" />
+				</a>
+			</li>
+			<li>
+				<a class="zoomOutButton" id="zoomOut" href="#">
+					<img src="styles/zoomOut.png" alt="Zoom Out" />
+				</a>
+			</li>
+		</ul>
+
+		
+		
+		<div class="toolbarButtons">
+			@if (!String.IsNullOrEmpty(tocURL))
+            {
+				<a class="tocButton toolbarLink internalLink" href="@tocURL" id="tocLink">
+					<img class="iconToolbar" src="styles/toc.png" alt="Table of Contents" />
+					<img class="iconToolbar mobile" src="styles/toc-mobile.png" alt="Table of Contents" />
+					<span id="tocLabel" class="titleTOCMenu"></span>
+				</a>
+            }
+		    @{
+		        var downloads = PublicationModel.ProjectModel.Downloads;
+                var hasDownloads = (downloads != null && 
+                                        (downloads.Mac!=null || downloads.Pdf!=null || 
+                                        (downloads.UserFiles!=null && downloads.UserFiles.Any()) || downloads.Windows!=null)) || 
+                                    PublicationModel.ProjectModel.PublicationType == RazorPublicationType.PhotoAlbum;
+            }
+			@if (hasDownloads)
+            {
+
+				<ul class="downloadButton toolbarLink">
+					<li class="iconLi">
+						<img class="iconToolbar" src="styles/save.png" alt="Downloads" />
+                        <img class="iconToolbar mobile" src="styles/save-mobile.png" alt="Downloads" />
+					</li>
+                    @if (PublicationModel.ProjectModel.PublicationType == RazorPublicationType.PhotoAlbum)
+                    {
+                        <li id="downloadPdf" class="downloadSubMenu">
+                            <a id="downloadPageLink" href="@(PublicationModel.DynamicFilesFolder)/common/page-substrates/page@(current.Id.ToString("0000")).@ImageFormat(current.SubstrateImageType)" target="_blank"></a>
+                        </li>
+                    }
+                    else if (PublicationModel.ProjectModel.Downloads != null && PublicationModel.ProjectModel.Downloads.Pdf != null)
+                    {
+						<li id="downloadPdf" class="downloadSubMenu">
+							<a id="downloadPdfLink" href="@(PublicationModel.DynamicFilesFolder)/@PublicationModel.ProjectModel.Downloads.Pdf.File.OriginalString" target="_blank"></a>
+						</li>
+                    }
+					@if (PublicationModel.ProjectModel.Downloads != null &&  PublicationModel.ProjectModel.Downloads.Mac != null)
+                    {
+						<li id="downloadMac" class="downloadSubMenu">
+							<a id="downloadMacLink" href="@(PublicationModel.DynamicFilesFolder)/@PublicationModel.ProjectModel.Downloads.Mac.File.OriginalString" target="_blank"></a>
+						</li>
+                    }
+					@if (PublicationModel.ProjectModel.Downloads != null &&  PublicationModel.ProjectModel.Downloads.Windows != null)
+                    {
+						<li id="downloadWindows" class="downloadSubMenu">
+							<a id="downloadWindowsLink" href="@(PublicationModel.DynamicFilesFolder)/@PublicationModel.ProjectModel.Downloads.Windows.File.OriginalString" target="_blank"></a>
+						</li>
+                    }
+                    @if (PublicationModel.ProjectModel.Downloads != null)
+                    {
+                        foreach (var userFile in PublicationModel.ProjectModel.Downloads.UserFiles)
+                        {
+                            <li class="downloadSubMenu userFile">
+                                <a class="userFileLink" href="@(PublicationModel.DynamicFilesFolder)/@userFile.File.OriginalString" target="_blank">@Path.GetFileName(userFile.File.OriginalString)</a>
+                            </li>
+                        }
+                    }
+					
+				</ul>
+            }
+		</div>
+
+		
+		
+        @{
+            var prev = PublicationModel.PageIndex == 0 ? tocURL : PageUrl(PublicationModel.ProjectModel.Pages.ElementAt(PublicationModel.PageIndex - 1));
+            var next = PublicationModel.PageIndex == lastIndex ? "" : PageUrl(PublicationModel.ProjectModel.Pages.ElementAt(PublicationModel.PageIndex + 1));
+            var prevPageId = PublicationModel.PageIndex == 0 ? "tocPageArrow" : "pagePrevArrow";
+        }
+        @if (PublicationModel.ProjectModel.Settings.RtlModeEnabled)
+        {
+            if (!String.IsNullOrEmpty(next))
+            {
+				<a id="nextPageArrow" class="toLeftButton toolbarLink internalLink" href="@next"><img class="iconToolbar" src="styles/previous.png" alt="Next Page" /></a>
+            }
+        }
+        else
+        {
+            if (!String.IsNullOrEmpty(prev))
+            {
+			<a id="@prevPageId" class="toLeftButton toolbarLink internalLink" href="@prev"><img class="iconToolbar" src="styles/previous.png" alt="Previous Page" /></a>
+            }
+        }
+        @{
+            var currentPageName = String.IsNullOrEmpty(current.Name) ? current.Id.ToString() : current.Name;
+            var totalPages = "";
+            
+            if (String.IsNullOrEmpty(PublicationModel.ProjectModel.Styles.CustomTotalPages))
+            {
+                var totalPagesCount = CountTotalPages(PublicationModel.ProjectModel.Settings.PageTypeHelper, PublicationModel.ProjectModel.Styles.NumerationOffset);
+                if (totalPagesCount > 0)
+                {
+                    totalPages = "/ " + totalPagesCount.ToString();
+                }
+                else
+                {
+                    totalPages = "/ " + PublicationModel.ProjectModel.Pages.ElementAt(lastIndex).Name;
+                }
+            }
+            else
+            {
+                totalPages = PublicationModel.ProjectModel.Styles.CustomTotalPages;
+            }
+            
+                
+              
+        }
+		<span class="pager"><span id="pageLabel"></span>&nbsp;@currentPageName @totalPages</span>
+
+        @if (PublicationModel.ProjectModel.Settings.RtlModeEnabled)
+        {
+            if (!String.IsNullOrEmpty(prev))
+            {
+				<a id="@prevPageId" class="toRightButton toolbarLink internalLink" href="@prev"><img class="iconToolbar" src="styles/next.png" alt="Previous Page" /></a>
+            }
+        }
+        else
+        {
+            if (!String.IsNullOrEmpty(next))
+            {
+				<a id="nextPageArrow" class="toRightButton toolbarLink internalLink" href="@next"><img class="iconToolbar" src="styles/next.png" alt="Next Page" /></a>
+            }
+        }
+
+        @if (PublicationModel.ProjectModel.IsShareEnabled)
+        {
+		<ul class="sharingContainer">
+			<li>
+				<a class="facebookShare" id="facebookShare" href="#" target="_blank">
+                    <img src="styles/facebook_32.png" alt="Share on Facebook" />
+					<span id="facebookShareText" class="shareTitleMenu"></span>
+				</a>
+			</li>
+			<li>
+                <a class="twitterShare" id="twitterShare" href="#" target="_blank">
+                    <img src="styles/twitter_32.png" alt="Tweet" />
+                    <span id="twitterShareText" class="shareTitleMenu"></span>
+                </a>
+			</li>
+			<li>
+                <a class="linkedinShare" id="linkedinShare" href="#" target="_blank">
+                    <img src="styles/linkedin_32.png" alt="Share on LinkedIn" />
+                    <span id="linkedinShareText" class="shareTitleMenu"></span>
+                </a>
+			</li>
+			<li>
+                <a class="tumblrShare" id="tumblrShare" href="#" target="_blank">
+                    <img src="styles/tumblr_32.png" alt="Share on Tumblr" />
+                    <span id="tumblrShareText" class="shareTitleMenu"></span>
+                </a>
+			</li>
+			<li>
+                <a class="googleShare" id="googleShare" href="#" target="_blank">
+                    <img src="styles/google_32.png" alt="Share on Google+" />
+                    <span id="googleShareText" class="shareTitleMenu"></span>
+                </a>
+			</li>
+			<li>
+                <a class="mailShare" id="mailShare" href="#" target="_blank">
+                    <img src="styles/email_32.png" alt="E-mail" />
+                    <span id="mailShareText" class="shareTitleMenu"></span>
+                </a>
+			</li>
+			<li>
+                <a class="vkShare" id="vkShare" href="#" target="_blank">
+                    <img src="styles/vk_32.png" alt="Share on VK" />
+                    <span id="vkShareText" class="shareTitleMenu"></span>
+                </a>
+			</li>
+		</ul>
+        }
+
+
+		<div class="verContainer" id="verContainer">
+			<span id="basicVersionTitle" class="basicInfoTitle"></span>
+			<a id="infoButton" class="toolbarLink info" href="#"><img class="iconInfo" src="styles/info.png" alt="Information" /></a>
+
+		</div>
+	</div>
+
+	<div class="mainFrame" id="mainFrame">
+        @{
+            var mobileButtonStyle = "display:none;";
+            var mobileButtonId = "";
+            if (!String.IsNullOrEmpty(tocURL) || PublicationModel.ProjectModel.IsShareEnabled || hasDownloads )
+            {
+                mobileButtonStyle = "";
+                mobileButtonId = "mobileMenuButton";
+            }
+        }
+		<a class="mobileMenuButton" id="@mobileButtonId">
+            <img src="styles/mobile-menu.png" alt="Show Menu" style="@mobileButtonStyle" />
+		</a>
+
+		<div class="mobileNav">
+			@if (PublicationModel.ProjectModel.Settings.RtlModeEnabled)
+            {
+                if (!String.IsNullOrEmpty(next))
+                {
+					<a class="toLeftButton toolbarLink internalLink" href="@next"><img class="iconToolbar" src="styles/prev-mob.png" alt="Next Page" /></a>
+                }
+            }
+            else
+            {
+                if (!String.IsNullOrEmpty(prev))
+                {
+					<a class="toLeftButton toolbarLink internalLink" href="@prev"><img class="iconToolbar" src="styles/prev-mob.png" alt="Previous Page" /></a>
+                }
+            }
+			<span class="pager">@currentPageName @totalPages</span>
+			@if (PublicationModel.ProjectModel.Settings.RtlModeEnabled)
+            {
+                if (!String.IsNullOrEmpty(prev))
+                {
+					<a class="toRightButton toolbarLink internalLink" href="@prev"><img class="iconToolbar" src="styles/next-mob.png" alt="Previous Page" /></a>
+                }
+            }
+            else
+            {
+                if (!String.IsNullOrEmpty(next))
+                {
+					<a class="toRightButton toolbarLink internalLink" href="@next"><img class="iconToolbar" src="styles/next-mob.png" alt="Next Page" /></a>
+                }
+            }
+		</div>
+
+		<div id="pageContainer" class="pageContainer" style="width: @(current.Size.Width)px; height: @(current.Size.Height)px; margin: 40px 0 0 -@(current.Size.Width / 2)px; background-color:@System.Drawing.ColorTranslator.ToHtml(current.SubstrateBackgroundColor);">
+			<img alt="Page Background" src="@(PublicationModel.DynamicFilesFolder)/common/page-substrates/page@(current.Id.ToString("0000")).@ImageFormat(current.SubstrateImageType)" style="width: 100%; height: 100%;">
+
+			@{
+                var fontsDoctionary = new Dictionary<String, RazorTextBlock>();
+			}
+			@foreach (RazorContentItemBase item in current.Content)
+            {
+                var styles = new Dictionary<String, String>();
+                styles.Add("top", PercentSize(item.Top, current.Size.Height));
+                styles.Add("left", PercentSize(item.Left, current.Size.Width));
+                styles.Add("width", PercentSize(item.Width, current.Size.Width));
+                styles.Add("height", PercentSize(item.Height, current.Size.Height));
+
+                if (item is RazorTextBlock)
+                {
+                    var textBlock = (RazorTextBlock)item;
+                    styles.Add("font-size", FontSizeEm(textBlock.Size));
+                    styles.Add("color", System.Drawing.ColorTranslator.ToHtml(textBlock.Color));
+                    //TODO Обернуть текст в кавычки
+                    styles.Add("font-family", @textBlock.Font.Name);
+
+                    //обработка шрифтов
+                    var addSpan = "";
+                    var key = textBlock.Font.Name + (textBlock.Font.IsItalic ? "_italic" : "") + (textBlock.Font.IsBold ? "_bold" : "");
+                    if (!fontsDoctionary.ContainsKey(key))
+                    {
+                        fontsDoctionary[key] = textBlock;
+                        addSpan = "testString";
+                    }
+
+                    if (item is RazorTextLink)
+                    {
+                        var textLink = (RazorTextLink)item;
+                        var href = textLink.TargetPageId.HasValue ? PageUrl(PageModelById(PublicationModel, textLink.TargetPageId.Value)) : (textLink.TargetUrl.AbsoluteUri);
+                        var addClassName = textLink.TargetPageId.HasValue ? "internalLink" : "";
+                        var linkTarget = textLink.TargetPageId.HasValue ? "_self" : (textLink.TargetType.HasValue ? TargetType(textLink.TargetType.Value) : "");
+						<a class="linkTextItem @addSpan @addClassName" href="@href" target="@linkTarget"  style="@(String.Join(";", styles.Select(i => i.Key + ":" + i.Value)));">
+							@MakeText(textLink, String.IsNullOrEmpty("addSpan"))
+						</a>
+                    }
+                    else
+                    {
+
+						<p class="textItem @addSpan" style="@(String.Join(";", styles.Select(i => i.Key + ":" + i.Value)));">
+							@MakeText(textBlock, String.IsNullOrEmpty("addSpan"))
+						</p>
+                    }
+                }
+
+                if (item is RazorLink)
+                {
+                    var areaLink = (RazorLink)item;
+                    var href = areaLink.TargetPageId.HasValue ? PageUrl(PageModelById(PublicationModel, areaLink.TargetPageId.Value)) : areaLink.TargetUrl.OriginalString;
+                    string id = areaLinkIndexDictionary.ContainsKey(areaLink) ? ("areaLink" + areaLinkIndexDictionary[areaLink].ToString()) : null;
+                    var addClassName = areaLink.TargetPageId.HasValue ? "internalLink" : "";
+                    var linkTarget = areaLink.TargetPageId.HasValue ? "_self" : (areaLink.TargetType.HasValue ? TargetType(areaLink.TargetType.Value) : "");
+                    <a class="areaLinkItem @addClassName" href="@href" id="@id" target="@linkTarget"
+                       style="@String.Join(";", styles.Select(i => i.Key + ":" + i.Value))">
+                    </a>
+
+                }
+
+                if (item is RazorVideo)
+                {
+                    var video = (RazorVideo)item;
+                    var videoItemStyle = "";
+                    var videoID = VIDEOS_DICT[video];
+                    if (video.ShowImage && video.Image == null)
+                    {
+                        {
+                            videoItemStyle = "background-color: #000000";
+                        }
+                    }
+
+					<div id="@videoID" class="videoItem @video.Type.ToString().ToLower()" style="@(String.Join(";", styles.Select(i => i.Key + ":" + i.Value))); @videoItemStyle">
+                        <img class="play" alt="Play Video" src="@PublicationModel.StaticFilesFolder.OriginalString/styles/videoIcon.png">
+					</div>
+                }
+
+                if (item is RazorImage)
+                {
+                    var image = (RazorImage)item;
+                    var guid = Guid.NewGuid().ToString();
+
+                    GALLERY_CONTENT.Add(guid, image.Images.Select(a => (PublicationModel.DynamicFilesFolder) + "/common/pages-content/" + a.ToString()));
+
+                    var imageItemAddClass = image.PreviewImage == null ? "emptyImage" : "";
+                    var imageItemStyle = image.PreviewImage == null ?
+                        "" :
+                        ("background:url('" + (PublicationModel.DynamicFilesFolder) + "/common/pages-content/" + image.PreviewImage.ToString() + "') center center no-repeat; background-size:cover;");
+                    <div id="@guid" class="imageItem @imageItemAddClass" style="@(String.Join(";", styles.Select(i => i.Key + ":" + i.Value))); @imageItemStyle">
+                       @{if (image.PreviewImage != null)
+                        {
+                            <div class="contentItemHover"></div>
+                        }
+                    }  
+                    </div>
+                }
+            }
+		</div>
+
+		<div class="footer">
+			@if (PublicationModel.ProjectModel.Pages.Count() > 1)
+            {
+                var itemsBefore = 5;
+                var itemsAfter = 5;
+                var totalItems = itemsBefore + itemsAfter + 1;
+
+                var startIndex = PublicationModel.PageIndex - itemsBefore;
+                if (startIndex < 0)
+                {
+                    startIndex = 0;
+                }
+
+                var endIndex = startIndex + totalItems;
+                if (startIndex != 0 && endIndex > lastIndex)
+                {
+                    var delta = Math.Min(startIndex, endIndex - lastIndex);
+                    startIndex -= delta;
+                    endIndex -= delta;
+                }
+
+                var count = 0;
+                if (startIndex != 0 && PublicationModel.PageIndex != startIndex)
+                {
+					<a style="color:@textColor;" class="footerNavLink internalLink" href="@(PageUrl(PublicationModel.ProjectModel.Pages.ElementAt(0)))">@PublicationModel.ProjectModel.Pages.ElementAt(0).Name</a>
+                    if (startIndex != 1)
+                    {
+						<span style="color:@textColor;" class="footerNavLink">&#8230;</span>
+                    }
+                }
+
+                while (count <= totalItems)
+                {
+                    if ((startIndex + count) > lastIndex)
+                    {
+                        endIndex = startIndex + count - 1;
+                        break;
+                    }
+                    var curr = ((startIndex + count) == PublicationModel.PageIndex) ? "currPage" : "";
+					<a style="color:@textColor;" class="footerNavLink internalLink @curr" href="@(PageUrl(PublicationModel.ProjectModel.Pages.ElementAt(startIndex + count)))">@PublicationModel.ProjectModel.Pages.ElementAt(startIndex + count).Name</a>
+                    count++;
+                }
+
+                if (endIndex < lastIndex && PublicationModel.PageIndex != lastIndex)
+                {
+                    if (endIndex != lastIndex - 1)
+                    {
+						<span style="color:@textColor;" class="footerNavLink">&#8230;</span>
+                    }
+					<a style="color:@textColor;" class="footerNavLink internalLink" href="@(PageUrl(PublicationModel.ProjectModel.Pages.ElementAt(lastIndex)))">@PublicationModel.ProjectModel.Pages.ElementAt(lastIndex).Name</a>
+                }
+            }
+
+			@if (PublicationModel.ProjectModel.CopyrightSettings.IsSeoPoweredByLinkVisible)
+            {
+				<a style="color:@textColor;" class="footerLink" href="./flipbook.html" target="_blank">
+					<span id="poweredBy"></span>&nbsp;FlippingBook
+				</a>
+            }
+            else
+            {
+                if (PublicationModel.ProjectModel.CopyrightSettings.IsButtonVisible)
+                {
+					<a style="color:@textColor;" class="footerLink" href="@PublicationModel.ProjectModel.CopyrightSettings.Link" target="@TargetType(PublicationModel.ProjectModel.CopyrightSettings.LinkTarget)" >					
+                        @PublicationModel.ProjectModel.CopyrightSettings.Text
+					</a>
+				}
+			}
+		</div>
+	</div>
+	<script type="text/javascript">
+	        if (typeof BASIC_PAGE === 'undefined' && typeof BasicPage !== 'undefined' ){
+	            BASIC_PAGE = new BasicPage();
+	        }
+	        GALLERY_CONTENT = @Html.Raw(JsonConvert.SerializeObject(GALLERY_CONTENT, Formatting.Indented));
+
+    </script>
+</body>
+</html>
+
+
+
+@helper areaLinkBgStyle(System.Drawing.Color color)
+{
+    var htmlColor = System.Drawing.ColorTranslator.ToHtml(color);
+    var a = (color.A / 255.0).ToString("N1", System.Globalization.CultureInfo.InvariantCulture);
+
+	<text>
+	background: transparent;
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=@(htmlColor),endColorstr=@(htmlColor));
+	zoom:1;
+	
+	background:rgb(@color.R,@color.G,@color.B);
+	background:rgba(@color.R,@color.G,@color.B, @a);
+	</text>
+}
+
+
+@helper MetaRobots(RazorPageSeoSettings seoSettings)
+{
+    var list = new List<String>();
+    if (seoSettings.NoFollow)
+    {
+        list.Add("nofollow");
+    }
+    if (seoSettings.NoIndex)
+    {
+        list.Add("noindex");
+    }
+
+    if (list.Count == 0)
+    {
+        @Html.Raw("all");
+    }
+    else
+    {
+        @Html.Raw(String.Join(",", list.ToArray()));
+    }
+
+}
+@helper MakeText(RazorTextBlock textBlock, bool addSpan)
+{
+    var start = "";
+    var end = "";
+
+    if (addSpan)
+    {
+        start += "<span>";
+        end = "</span>" + end;
+    }
+    if (textBlock.Font.IsBold)
+    {
+        start += "<b>";
+        end = "</b>" + end;
+    }
+    if (textBlock.Font.IsItalic)
+    {
+        start += "<i>";
+        end = "</i>" + end;
+    }
+
+    WriteLiteral(start);
+    Write(textBlock.Text);
+    WriteLiteral(end);
+}
+
+@functions{
+    public static int DEFAULT_SIZE = 20;
+
+    public static Dictionary<RazorLink, int> areaLinkIndexDictionary = new Dictionary<RazorLink, int>();
+
+    public static string PercentSize(Double currentSize, Double pageSize)
+    {
+        return (currentSize / pageSize * 100).ToString("N6", System.Globalization.CultureInfo.InvariantCulture) + "%";
+    }
+
+    public static string FontSizeEm(decimal fontSizePX)
+    {
+        return (fontSizePX / DEFAULT_SIZE).ToString("N6", System.Globalization.CultureInfo.InvariantCulture) + "em";
+    }
+
+
+    public static string TargetType(RazorUrlTargetType type)
+    {
+        switch (type)
+        {
+            case RazorUrlTargetType.Blank:
+                return "_blank";
+            case RazorUrlTargetType.Parent:
+                return "_parent";
+            case RazorUrlTargetType.Self:
+                return "_self";
+            case RazorUrlTargetType.Top:
+                return "_top";
+        }
+        return type.ToString();
+    }
+
+    public static string ImageFormat(RazorImageFormatType format)
+    {
+        switch (format)
+        {
+            case RazorImageFormatType.Jpeg:
+                return "jpg";
+            case RazorImageFormatType.Png:
+                return "png";
+        }
+        return "";
+    }
+
+
+    public RazorPageModel PageModelById(RazorPageContext PublicationModel, int id)
+    {
+        return PublicationModel.ProjectModel.Pages.First(x => x.Id == id);
+    }
+
+    public static string PageUrl(RazorPageModel model)
+    {
+        return String.Format("./page-{0}.html", model.UrlHeader);
+    }
+
+    public static int CountTotalPages(string pageTypeHelper, int offset)
+    {
+        var count = 0;
+        var str = String.IsNullOrEmpty(pageTypeHelper)? "" : pageTypeHelper.ToLower() ;
+        for (int i = 0; i < str.Length; i++)
+        {
+            switch (str[i])
+            {
+                case 'w':
+                    count += 2;
+                    break;
+                case 'l':
+                case 'r':
+                case 's':
+                    count++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return count - offset;
+    }
+    public static string JavaScriptStringEncode(string value, bool addDoubleQuotes)
+    {
+        if (String.IsNullOrEmpty(value))
+            return addDoubleQuotes ? "\"\"" : String.Empty;
+
+        int len = value.Length;
+        bool needEncode = false;
+        char c;
+        for (int i = 0; i < len; i++)
+        {
+            c = value[i];
+
+            if (c >= 0 && c <= 31 || c == 34 || c == 39 || c == 60 || c == 62 || c == 92)
+            {
+                needEncode = true;
+                break;
+            }
+        }
+
+        if (!needEncode)
+            return addDoubleQuotes ? "\"" + value + "\"" : value;
+
+        var sb = new System.Text.StringBuilder();
+        if (addDoubleQuotes)
+            sb.Append('"');
+
+        for (int i = 0; i < len; i++)
+        {
+            c = value[i];
+            if (c >= 0 && c <= 7 || c == 11 || c >= 14 && c <= 31 || c == 39 || c == 60 || c == 62)
+                sb.AppendFormat("\\u{0:x4}", (int)c);
+            else switch ((int)c)
+                {
+                    case 8:
+                        sb.Append("\\b");
+                        break;
+
+                    case 9:
+                        sb.Append("\\t");
+                        break;
+
+                    case 10:
+                        sb.Append("\\n");
+                        break;
+
+                    case 12:
+                        sb.Append("\\f");
+                        break;
+
+                    case 13:
+                        sb.Append("\\r");
+                        break;
+
+                    case 34:
+                        sb.Append("\\\"");
+                        break;
+
+                    case 92:
+                        sb.Append("\\\\");
+                        break;
+
+                    default:
+                        sb.Append(c);
+                        break;
+                }
+        }
+
+        if (addDoubleQuotes)
+            sb.Append('"');
+
+        return sb.ToString();
+    }
+
+    public static string GetFileName(string path)
+    {
+        int fileExtPos = path.LastIndexOf(".");
+        if (fileExtPos >= 0)
+            return path.Substring(0, fileExtPos);
+        
+        return path;
+    }
+}

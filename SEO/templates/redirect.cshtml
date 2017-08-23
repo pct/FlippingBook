@@ -1,0 +1,47 @@
+﻿@using Mediaparts.Features.PublicationExporting.DAL.Razor
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.Contexts
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.PageContent
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.Settings
+
+@{
+    RazorBaseContext PublicationModel = null;
+
+    if (Model is RazorBaseContext)
+    {
+        PublicationModel = (RazorBaseContext)Model;
+        //Костыль, потому что basic находится в папке assets/basic-html
+        PublicationModel.DynamicFilesFolder = new Uri("./..", UriKind.Relative);
+        PublicationModel.StaticFilesFolder = new Uri(".", UriKind.Relative);
+    }
+    else
+    {
+        //Fill this to debug
+        PublicationModel = new RazorBaseContext();
+        PublicationModel.DynamicFilesFolder = new Uri("./debug", UriKind.Relative);
+        PublicationModel.StaticFilesFolder = new Uri(".", UriKind.Relative);
+
+        PublicationModel.IndexFileName = "index.html";
+    }
+}
+@{
+    var url = "../../../" + PublicationModel.IndexFileName;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <script type="text/javascript">
+			var url = "@url";
+        if (document.domain.indexOf('publ.com') != -1 || document.domain.indexOf('cld.bz') != -1 || document.domain.indexOf('cld.mobi') != -1 || document.domain.indexOf('cld.local') != -1) {
+				url = window.location.protocol + window.location.host + "/" + window.location.href.split('/')[4];
+			}
+
+			window.location = url + window.location.search + window.location.hash;
+    </script>
+    <title>Redirect</title>
+</head>
+<body>
+    If you are not redirected automatically, follow the <a href='@url'>link</a>.
+</body>
+</html>

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<DataSchema Type="Html5Skin" Version="0.0.0">
+  <Property Name="font-weight-normal" Type="String" DefaultValue="600" />
+  <Property Name="font-weight-bold" Type="String" DefaultValue="800" />
+  <Property Name="main-color" Type="Color" DefaultValue="#FF5a5f63" UseAlpha="False" />
+  <Property Name="main-icon-color" Type="Color" DefaultValue="#FFC0C2C3" UseAlpha="False" />
+  <Property Name="main-button-color" Type="Color" DefaultValue="#FFA5AEB5" UseAlpha="False" />
+  <Property Name="main-text-color" Type="Color" DefaultValue="#FFF6F6F6" UseAlpha="False" />
+  <Property Name="second-color" Type="Color" DefaultValue="#FFf2f2f2" UseAlpha="False" />
+  <Property Name="second-text-color" Type="Color" DefaultValue="#FF121212" UseAlpha="False" />
+  <Property Name="second-icon-color" Type="Color" DefaultValue="#FF121212" UseAlpha="False" />
+  <Property Name="second-button-color" Type="Color" DefaultValue="#FF808080" UseAlpha="False" />
+  <Property Name="background-shadow-color" Type="Color" DefaultValue="#FF737373" UseAlpha="False" />
+  <Property Name="background-color" Type="Color" DefaultValue="#FFE7E7E7" UseAlpha="False" />
+  <Property Name="bottom-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="bottom-center-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="bottom-left-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="bottom-right-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="bottom-right-background-text-color" Type="Color" DefaultValue="#FF575757" UseAlpha="False" />
+  <Property Name="bottom-left-background-text-color" Type="Color" DefaultValue="#FF575757" UseAlpha="False" />
+  <Property Name="bottom-icon-color" Type="Color" DefaultValue="#FF6D6D6D" UseAlpha="False" />
+  <Property Name="bottom-left-icon-color" Type="Color" DefaultValue="#FF6D6D6D" UseAlpha="False" />
+  <Property Name="bottom-right-icon-color" Type="Color" DefaultValue="#FF6D6D6D" UseAlpha="False" />
+  <Property Name="middle-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="middle-left-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="middle-right-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="middle-right-icon-color" Type="Color" DefaultValue="#FF6D6D6D" UseAlpha="False" />
+  <Property Name="middle-left-icon-color" Type="Color" DefaultValue="#FF6D6D6D" UseAlpha="False" />
+  <Property Name="top-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="top-left-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="top-left-text-color" Type="Color" DefaultValue="#FF565656" UseAlpha="False" />
+  <Property Name="top-right-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="top-right-button-color" Type="Color" DefaultValue="#FF737373" UseAlpha="False" />
+  <Property Name="top-right-icon-color" Type="Color" DefaultValue="#FF6D6D6D" UseAlpha="False" />
+  <Property Name="top-center-background-color" Type="Color" DefaultValue="#FFe7e7e7" UseAlpha="False" />
+  <Property Name="background-image" Type="ImageFile" DefaultValue="" />
+  <Property Name="background-size" Type="Enum" DefaultValue="backgroun-size_tile">
+    <Member Value="background-size_fit" />
+    <Member Value="background-size_fill" />
+    <Member Value="background-size_tile" />
+  </Property>
+  <Property Name="background-position" Type="String" DefaultValue="center center" />
+  <Property Name="background-repeat" Type="String" DefaultValue="repeat" />
+  <Property Name="classes" Type="String" DefaultValue="opaqueTop" />
+  <Property Name="tool-window-width" Type="String" DefaultValue="240px" />
+  <Property Name="main-margin-bottom" Type="String" DefaultValue="0px" />
+  <Property Name="menu-height" Type="String" DefaultValue="45px" />
+  <Property Name="logo" Type="String" DefaultValue="skins/current/logo.png" />
+  <Property Name="logo-file" Type="ImageFile" DefaultValue=""/>
+</DataSchema>
