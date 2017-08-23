@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TemplateItem Type="Localization" Version="2.8.24" CreatedInVersion="2.8.24">
+  <Name>台灣</Name>
+  <LargeImageInBase64>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</LargeImageInBase64>
+  <LocaleData Version="2.8.24" LocaleName="zh">
+    <Property Type="String" Name="PermanentLinkBar_ANIMATED_SPREAD" Value="動畫傳播">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_COPY_BUTTON" Value="複製">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_EMBEDDING_TYPE" Value="嵌入類型">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_FULL_PUBLICATION" Value="完整電子書">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_INSERT_CURRENT_PAGE" Value="插入目前頁面">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_INSERT_TO_SITE_TAB" Value="嵌入到網站">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_LINKABLE_PAGE" Value="可連結頁面">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_SEND_BY_EMAIL" Value="透過Email傳送">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_SHARE_CURRENT_PAGE" Value="分享目前頁面">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_SHARE_TEXT" Value="您可以透過社群網路分享這本電子書，只需點按對應的按鈕。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_SHARE_TO_FACEBOOK" Value="在Facebook上分享">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_SHARE_TO_GOOGLE_PLUS" Value="在Google+上分享">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_SHARE_TO_LINKEDIN" Value="在LinkedIn上分享">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_SHARE_TO_TUMBLR" Value="在Tumblr上分享">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_SHARE_TO_TWITTER" Value="在Twitter上分享">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_SHARE_TO_VK" Value="在 VK 上分享">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_WIDTH" Value="寬度">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PermanentLinkBar_COPY_TOOLTIP" Value="按Ctrl+C複製">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SaveWindow_FULL_PUBLICATION" Value="完整電子書">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SaveWindow_MAC_OFFLINE_PUBLICATION" Value="Mac離線出版物">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SaveWindow_SAVE_CURRENT_PAGE" Value="目前頁面">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SaveWindow_SAVE_GROUP" Value="">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SaveWindow_SAVE_LEFT_PAGE" Value="左頁">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SaveWindow_SAVE_RIGHT_PAGE" Value="右頁">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SaveWindow_SAVE_WINDOW_TEXT" Value="您可以輕鬆地下載這本電子書">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SaveWindow_TITLE" Value="下載電子書">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SaveWindow_WINDOWS_OFFLINE_PUBLICATION" Value="Windows離線出版物">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_ALL_PAGES" Value="全部頁面">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_BOOKMARKED_PAGES" Value="書籤的頁面">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_CURRENT_PAGES" Value="當前頁">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_ENTER_PAGE_NUMBERS" Value="輸入頁碼">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_PEPPER_TOO_MUCH_PAGES" Value="Chrome瀏覽器的Pepper Flash外掛模組不支持一次列印多於{0}頁面.">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_PREPARING_PAGES" Value="頁面製作進度: {0}%">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_PRINT_BUTTON" Value="列印">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_PRINT_PAGES_GROUP" Value="選定的頁面">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_PRINT_PREVIEW_GROUP" Value="預覽">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_SELECT_PAGES" Value="選擇頁面">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_SIZE_DATA" Value="{0} 頁 {1} MB">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="PrintWindow_TITLE" Value="列印">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_ANY_ERROR" Value="發生錯誤.">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_CHECKOUT_ERROR_TEXT" Value="結帳時出錯：{0}。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_CHECKOUT_ERROR_TITLE" Value="結帳錯誤">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_CHECKOUT_STATUS_TEXT" Value="您的訂單已收到並正在處理中！">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_CHECKOUT_STATUS_TITLE" Value="結帳狀態">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_FULLSCREEN_ERROR_TEXT" Value="全螢幕模式暫時被Flash Player阻止.">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_FULLSCREEN_TEXTINPUT_WARNING" Value="Flash player 在全螢幕下不支持鍵盤輸入.">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_LINK_PAGE_TIP" Value="頁面">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_NO_DOMAIN_ERROR_TEXT" Value="域名 {0} 未註冊.">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AlertMessage_NO_DOMAIN_ERROR_TITLE" Value="錯誤">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="NavigationPanel_FIRST_PAGE_TIP" Value="最前頁">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="NavigationPanel_LAST_PAGE_TIP" Value="最後頁">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="NavigationPanel_NEXT_PAGE_TIP" Value="下一頁">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="NavigationPanel_PAUSE_PAGE_TIP" Value="暫停">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="NavigationPanel_PLAY_PAGE_TIP" Value="開始播放">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="NavigationPanel_PREV_PAGE_TIP" Value="前一頁">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BottomMenu_BOOKMARKS_TIP" Value="書籤">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BottomMenu_FULLSCREEN_BUTTON_TIP" Value="全螢幕">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BottomMenu_NORMAL_BUTTON_TIP" Value="退出全螢幕">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BottomMenu_PRINT_TIP" Value="列印">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BottomMenu_SAVE_TIP" Value="下載">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BottomMenu_SELECT_BUTTON_TIP" Value="選擇文本">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BottomMenu_SOUND_BUTTON_TIP" Value="開啟/關閉聲音">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BottomMenu_THUMBNAILS_TIP" Value="頁面縮圖">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BottomMenu_TOC_TIP" Value="目錄">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="TopMenu_EXTERNAL_LINK_TIP" Value="訪問 {0}">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="TopMenu_PAGES_LABEL" Value="頁:">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ZoomBar_MAXIMIZE_ZOOM_BAR_TIP" Value="點擊此處展開縮放條">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ZoomBar_MINIMIZE_ZOOM_BAR_TIP" Value="點擊此處收合縮放條">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ZoomBar_ZOOM_OUT_TIP" Value="縮小">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="RightClickMenu_COPY_PAGE_LINK" Value="複製本頁連結">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="RightClickMenu_COPY_PUBLICATION_LINK" Value="複製出版物連結">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="RightClickMenu_COPY_SELECTED_TEXT" Value="複製選定文本">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="RightClickMenu_OPEN_ABOUT_WINDOW" Value="關於產品…">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="RightClickMenu_OPEN_SHARE_WINDOW" Value="打開分享視窗">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="AboutWindow_TITLE" Value="簡介">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="RestoreSessionWindow_RESTORE_QUESTION_TEXT" Value="回復上一次會話嗎?">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="RestoreSessionWindow_TITLE" Value="會話正在回復中">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ProductWindow_COLLAPSE" Value="收合">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ProductWindow_DETAILS" Value="詳情">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ProductWindow_PROCEED_TO_CHECKOUT" Value="結帳">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ProductWindow_QUANTITY" Value="數量">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ProductWindow_TITLE" Value="添加">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ProductWindow_TITLE_WITHOUT_CART" Value="產品訊息">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ProductWindow_VIEW_ON_WEBSITE" Value="在網站上查看">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_CHECKOUT" Value="結帳">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_ITEMS" Value="項: {0}">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_MAIL_CART_EMAIL" Value="電子郵件：">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_MAIL_CART_INVITATION" Value="請在下面輸入您的訊息，我們會盡快與您聯繫。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_MAIL_CART_NAME" Value="名稱:">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_MAIL_CART_OPTIONAL_PROMPT" Value="可選">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_MAIL_CART_PHONE" Value="電話：">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_MAIL_CART_SEND" Value="發送">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_PRICE" Value="價格">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_PRODUCT_ADDED" Value="已添加到購物車">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_QUANTITY" Value="數量">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_TITLE" Value="購物車">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_TOTAL" Value="總計:{0}">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="CartWindow_WAITING_FOR_CHECKOUT" Value="等待結帳...">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ChekoutStatusWindow_CLEAR_CART" Value="是否要清空購物車">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ValidationMessages_INVALID_CHAR" Value="您的電子郵件地址包含無效字符。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ValidationMessages_INVALID_DOMAIN" Value="您的電子郵件地址格式不正確。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ValidationMessages_INVALID_IP" Value="您的電子郵件地址中IP格式不正確。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ValidationMessages_INVALID_PERIOD" Value="您的電子郵件地址包含連續的點號。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ValidationMessages_MISSING_AT" Value="您的電子郵件地址缺少 at 符號(@)。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ValidationMessages_MISSING_PERIOD" Value="您的電子郵件地址缺少點號。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ValidationMessages_MISSING_USERNAME" Value="您的電子郵件地址缺少用户名。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ValidationMessages_TO_MANY_AT" Value="您的電子郵件地址包含過多@字符。">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="Other_CLICK_TO_READ" Value="閱讀更多">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BookmarksToolWindow_TITLE" Value="書籤">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BookmarksToolWindow_ADD_BOOKMARK" Value="增加">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BookmarksToolWindow_ADD_BOOKMARK_TIP" Value="增加書籤">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BookmarksToolWindow_BOOKMARK_DISABLED_TIP" Value="没有可增加書籤的頁面.">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BookmarksToolWindow_DELETE_BOOKMARK_TIP" Value="删除書籤">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BookmarksToolWindow_PAGE" Value="{0}頁">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BookmarksToolWindow_SAVE_BOOKMARK_TIP" Value="更新書籤">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BookmarksToolWindow_TEXTINPUT_TEXT" Value="输入書籤名...">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="BookmarksToolWindow_YOUR_BOOKMARKS" Value="您的書籤數 {0})">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SearchToolWindow_TITLE" Value="搜尋">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SearchToolWindow_MIN_WORD_ERRROR" Value="請注意, 搜尋最低值為{0}">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SearchToolWindow_PAGE_NUMBER" Value="第{0}頁">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SearchToolWindow_PAGES_FOUND" Value="找到 {0} 頁.">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SearchToolWindow_SEARCH_RESULTS" Value="搜结結果">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SearchToolWindow_QUERY_PLACEHOLDER" Value="在此输入文字">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="SearchToolWindow_SEARCH_IN_PROGRESS" Value="搜尋中......">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="ThumbnailsToolWindow_TITLE" Value="頁面縮圖">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="TOCToolWindow_TITLE" Value="目錄">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="TOCToolWindow_COLLAPSE_ALL" Value="全部收合">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+    <Property Type="String" Name="TOCToolWindow_EXPAND_ALL" Value="全部展開">
+      <MetaTag Name="ChangedByUser" />
+    </Property>
+  </LocaleData>
+</TemplateItem>

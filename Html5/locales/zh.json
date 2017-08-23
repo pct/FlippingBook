@@ -5,7 +5,7 @@
   "AlertMessage": {
     "ANY_ERROR": "發生了錯誤.",
     "CHECKOUT_DEMO_LINK": "了解如何創建您自己的電子商務刊物",
-    "CHECKOUT_DEMO_TEXT": "感謝您關註我們的數字目錄展示！",
+    "CHECKOUT_DEMO_TEXT": "感謝您關注我們的數字目錄展示！",
     "CHECKOUT_DEMO_TITLE": "數字目錄範例",
     "CHECKOUT_ERROR_IN_PUBLISHER": "設計模式中結賬不可用",
     "CHECKOUT_ERROR_TEXT": "結賬時出錯：%{0}。",
@@ -218,14 +218,14 @@
     "TITLE": "搜尋"
   },
   "TableOfContent": {
-    "COLLAPSE_ALL": "全部折疊",
+    "COLLAPSE_ALL": "全部收合",
     "EXPAND_ALL": "全部展開"
   },
   "ThumbnailsToolWindow": {
     "TITLE": "頁面縮圖"
   },
   "TOCToolWindow": {
-    "COLLAPSE_ALL": "全部折疊",
+    "COLLAPSE_ALL": "全部收合",
     "EXPAND_ALL": "全部展開",
     "TITLE": "篇目"
   },
@@ -247,7 +247,7 @@
   },
   "ZoomBar": {
     "MAXIMIZE_ZOOM_BAR_TIP": "點擊此處展開縮放條",
-    "MINIMIZE_ZOOM_BAR_TIP": "點擊此處折疊縮放條",
+    "MINIMIZE_ZOOM_BAR_TIP": "點擊此處收合縮放條",
     "ZOOM_FIT_TO_HEIGHT_TIP": "ZOOM_FIT_TO_HEIGHT_TIP",
     "ZOOM_FIT_TO_WIDTH_TIP": "ZOOM_FIT_TO_WIDTH_TIP",
     "ZOOM_FIT_TO_WINDOW_TIP": "ZOOM_FIT_TO_WINDOW_TIP",
