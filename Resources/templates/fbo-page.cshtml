@@ -1,0 +1,190 @@
+﻿@using Mediaparts.Features.PublicationExporting.DAL.Razor
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.Contexts
+@using Mediaparts.Features.PublicationExporting.DAL.Razor.PageContent
+
+
+@{
+    RazorPageContext PublicationModel = null;
+    var IS_DEBUG = false;
+
+
+
+    if (Model is RazorPageContext)
+    {
+        PublicationModel = (RazorPageContext)Model;
+        //Костыль, потому что basic находится в папке assets/basic-html
+        PublicationModel.DynamicFilesFolder = new Uri("./..", UriKind.Relative);
+        PublicationModel.StaticFilesFolder = new Uri(".", UriKind.Relative);
+    }
+    else
+    {
+        //Fill this to debug
+        PublicationModel = new RazorPageContext();
+        PublicationModel.DynamicFilesFolder = new Uri("./debug", UriKind.Relative);
+        PublicationModel.StaticFilesFolder = new Uri(".", UriKind.Relative);
+
+        using (var fs = File.OpenRead(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug/model.bin")))
+        {
+            var deserializer = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            PublicationModel.ProjectModel = (RazorProjectModel)deserializer.Deserialize(fs);
+        }
+
+        var PAGE_ID = 2;
+        PublicationModel.PageIndex = PublicationModel.ProjectModel.Pages.Select((a, i) => new { a, i }).First(x => x.a.Id == PAGE_ID).i;
+
+     
+        IS_DEBUG = true;
+    }
+    
+    
+    RazorPageModel current = (RazorPageModel) PublicationModel.ProjectModel.Pages.ElementAt(PublicationModel.PageIndex);
+}
+
+    <div class="pageContainer"
+        style="width: @(current.Size.Width)px; height: @(current.Size.Height)px; margin: 40px 0 0 -@(current.Size.Width / 2)px; background-color:@System.Drawing.ColorTranslator.ToHtml(current.SubstrateBackgroundColor);">
+
+        <img alt="Page Background"
+            src="book:///substrate" style="width: 100%; height: 100%;" />
+
+        @{
+            var fontsDoctionary = new Dictionary<String, RazorTextBlock>();
+        }
+
+        @foreach (RazorContentItemBase item in current.Content)
+        {
+            var styles = new Dictionary<String, String>();
+            styles.Add("top", PercentSize(item.Top, current.Size.Height));
+            styles.Add("left", PercentSize(item.Left, current.Size.Width));
+            styles.Add("width", PercentSize(item.Width, current.Size.Width));
+            styles.Add("height", PercentSize(item.Height, current.Size.Height));
+
+            if (item is RazorTextBlock)
+            {
+                var textBlock = (RazorTextBlock)item;
+                styles.Add("font-size", FontSizeEm(textBlock.Size));
+                styles.Add("color", System.Drawing.ColorTranslator.ToHtml(textBlock.Color));
+                styles.Add("font-family", @textBlock.Font.Name);
+
+                //обработка шрифтов
+                var addSpan = "";
+                var key = textBlock.Font.Name + (textBlock.Font.IsItalic ? "_italic" : "") + (textBlock.Font.IsBold ? "_bold" : "");
+                if (!fontsDoctionary.ContainsKey(key))
+                {
+                    fontsDoctionary[key] = textBlock;
+                    addSpan = "testString";
+                }
+
+                if (item is RazorTextLink)
+                {
+                    var textLink = (RazorTextLink)item;
+                    var href = textLink.TargetPageId.HasValue ? PageUrl(PageModelById(PublicationModel, textLink.TargetPageId.Value)) : (textLink.TargetUrl.IsAbsoluteUri ? textLink.TargetUrl.AbsoluteUri : textLink.TargetUrl.ToString());
+                    var addClassName = textLink.TargetPageId.HasValue ? "internalLink" : "";
+                    var linkTarget = textLink.TargetPageId.HasValue ? "_self" : (textLink.TargetType.HasValue ? TargetType(textLink.TargetType.Value) : "");
+                    <a class="linkTextItem @addSpan @addClassName" href="@href" target="@linkTarget" style="@(String.Join(";", styles.Select(i => i.Key + ":" + i.Value)));">
+                        @MakeText(textLink, String.IsNullOrEmpty("addSpan"))
+                    </a>
+                }
+                else
+                {
+                    <p class="textItem @addSpan" style="@(String.Join(";", styles.Select(i => i.Key + ":" + i.Value)));">
+                        @MakeText(textBlock, String.IsNullOrEmpty("addSpan"))
+                    </p>
+                }
+            }
+
+            if (item is RazorLink)
+            {
+                var areaLink = (RazorLink)item;
+                var href = areaLink.TargetPageId.HasValue ?
+                    PageUrl(PageModelById(PublicationModel, areaLink.TargetPageId.Value)) :
+                    areaLink.TargetUrl.OriginalString;
+
+
+                var addClassName = areaLink.TargetPageId.HasValue ? "internalLink" : "";
+
+                var linkTarget = areaLink.TargetPageId.HasValue ? "_self" : (areaLink.TargetType.HasValue ? TargetType(areaLink.TargetType.Value) : "");
+                <a class="areaLinkItem hovered @addClassName" href="@href" target="@linkTarget"
+                   style="@String.Join(";", styles.Select(i => i.Key + ":" + i.Value))">
+                </a>
+
+            }
+        }
+    </div>
+
+    @helper MakeText(RazorTextBlock textBlock, bool addSpan)
+    {
+        var start = "";
+        var end = "";
+
+        if (addSpan)
+        {
+            start += "<span>";
+            end = "</span>" + end;
+        }
+        if (textBlock.Font.IsBold)
+        {
+            start += "<b>";
+            end = "</b>" + end;
+        }
+        if (textBlock.Font.IsItalic)
+        {
+            start += "<i>";
+            end = "</i>" + end;
+        }
+
+        WriteLiteral(start);
+        Write(textBlock.Text);
+        WriteLiteral(end);
+    }
+
+    @functions{
+        public static string ImageFormat(RazorImageFormatType format)
+        {
+            switch (format)
+            {
+                case RazorImageFormatType.Jpeg:
+                    return "jpg";
+                case RazorImageFormatType.Png:
+                    return "png";
+            }
+            return "";
+        }
+
+        public static string PercentSize(Double currentSize, Double pageSize)
+        {
+            return (currentSize / pageSize * 100).ToString("N6", System.Globalization.CultureInfo.InvariantCulture) + "%";
+        }
+
+
+        public static string PageUrl(RazorPageModel model)
+        {
+            return String.Format("book:///{0}", model.UrlHeader);
+        }
+
+        public static int DEFAULT_SIZE = 20;
+        public static string FontSizeEm(decimal fontSizePX)
+        {
+            return (fontSizePX / DEFAULT_SIZE).ToString("N6", System.Globalization.CultureInfo.InvariantCulture) + "em";
+        }
+
+        public RazorPageModel PageModelById(RazorPageContext PublicationModel, int id)
+        {
+            return PublicationModel.ProjectModel.Pages.First(x => x.Id == id);
+        }
+
+        public static string TargetType(RazorUrlTargetType type)
+        {
+            switch (type)
+            {
+                case RazorUrlTargetType.Blank:
+                    return "_blank";
+                case RazorUrlTargetType.Parent:
+                    return "_parent";
+                case RazorUrlTargetType.Self:
+                    return "_self";
+                case RazorUrlTargetType.Top:
+                    return "_top";
+            }
+            return type.ToString();
+        }
+    }

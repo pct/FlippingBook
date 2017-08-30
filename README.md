@@ -1,4 +1,4 @@
-## FlippingBook 相關資源
+## FlippingBook 相關資源(繁體中文、無障礙檢測 2.0 A)
 
 ### 繁體中文翻譯
 取代路徑: Resources/Publication
@@ -19,7 +19,7 @@ Taiwan.p2lt
 
 
 ### 無障礙 2.0 修正
-(測試中)
+@TODO 修改 Resources/templates
 
 
 ## 授權？
